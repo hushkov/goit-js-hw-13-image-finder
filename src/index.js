@@ -3,6 +3,7 @@ import apiService from './js/apiService';
 import updateMarkUp from './js/updateMarkUp';
 import refs from './js/refs';
 import * as basicLightbox from 'basiclightbox';
+import toastrNotificator from './js/toastrNotificator';
 
 //=================== Listeners ======================
 
@@ -14,25 +15,54 @@ function resetGallery() {
   refs.gallery.innerHTML = '';
 }
 
+function showLoader() {
+  refs.loadMoreSpinner.classList.remove('is-hidden');
+}
+function hideLoader() {
+  refs.loadMoreSpinner.classList.add('is-hidden');
+}
+
 function submitHandler(e) {
   e.preventDefault();
   const form = e.currentTarget;
   apiService.query = form.elements.query.value;
   resetGallery();
+  hideLoader();
   apiService.resetPage();
   form.reset();
-  apiService.fetchImages().then(updateMarkUp);
+  apiService
+    .fetchImages()
+    .then(data => {
+      updateMarkUp(data);
+      return data;
+    })
+    .then(data => {
+      if (!data.length) {
+        toastrNotificator.error();
+        return;
+      }
+      setTimeout(showLoader, 1000);
+      return data;
+    })
+    .catch(err => console.log('error' + err));
   apiService.incrementPage();
-
-  setTimeout(showLoader, 1000);
-}
-
-function showLoader() {
-  refs.loadMoreSpinner.classList.remove('is-hidden');
 }
 
 function loadMoreHandler() {
-  apiService.fetchImages().then(updateMarkUp);
+  apiService
+    .fetchImages()
+    .then(data => {
+      updateMarkUp(data);
+      return data;
+    })
+    .then(data => {
+      if (!data.length) {
+        hideLoader();
+        toastrNotificator.info();
+      }
+
+      return data;
+    });
   apiService.incrementPage();
 }
 
