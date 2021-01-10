@@ -69,7 +69,7 @@ function loadMoreHandler() {
 function modalBoxHandler({ target }) {
   const urlFullImage = target.dataset.fullImg;
 
-  if (target.nodeName !== 'IMG') {
+  if (target.nodeName !== 'IMG' && target.nodeName !== 'DIV') {
     return;
   }
   const instance = basicLightbox
