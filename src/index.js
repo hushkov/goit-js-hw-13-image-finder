@@ -29,7 +29,7 @@ function submitHandler(e) {
   resetGallery();
   hideLoader();
   apiService.resetPage();
-  form.reset();
+  // form.reset();
   apiService
     .fetchImages()
     .then(data => {
